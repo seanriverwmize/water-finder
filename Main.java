@@ -1,6 +1,6 @@
 import java.awt.*;
-import java.awt.event.*;
 import java.awt.datatransfer.*;
+import java.awt.event.*;
 import java.io.IOException;
 
 public class Main {
@@ -68,6 +68,7 @@ public class Main {
         }
         robot.delay(1000); //wait for 1 second
         robot.keyPress(KeyEvent.VK_ENTER); //press enter key
+        robot.keyRelease(KeyEvent.VK_ENTER); //release enter key
         robot.delay(1000); //wait for 1 second
 
         robot.mouseWheel(4); //scroll down
