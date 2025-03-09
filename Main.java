@@ -1,12 +1,13 @@
 import java.awt.*;
 import java.awt.datatransfer.*;
 import java.awt.event.*;
+import java.io.FileWriter;
 import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws AWTException, UnsupportedFlavorException, IOException {
-        boolean isValidZip;
         Robot inputController = new Robot(); //create robot object
+        
 
         String zipCodesString = """
         10001-14999, 15001-19699, 19700-19999, 19815, 19853, 19925, 20001-20599, 20101-20199,  
@@ -40,10 +41,14 @@ public class Main {
                 int endZip = Integer.parseInt(zipCodeRange[1]);
                 for (int currentZip = startZip; currentZip <= endZip; currentZip++) {
                     enterZip(inputController, currentZip);
+                    handleUtilitySelectionPage(inputController, currentZip);
+                    handleUtilityPage(inputController, currentZip);
                 }
             } else {
                 int currentZip = Integer.parseInt(zipCodeString);
                 enterZip(inputController, currentZip);
+                handleUtilitySelectionPage(inputController, currentZip);
+                handleUtilityPage(inputController, currentZip);
             }
         }
 
@@ -71,64 +76,39 @@ public class Main {
         robot.keyRelease(KeyEvent.VK_ENTER); //release enter key
         robot.delay(1000); //wait for 1 second
 
+        
+    }
+
+    public static void handleUtilitySelectionPage(Robot robot, int zip) throws AWTException, UnsupportedFlavorException, IOException {
         robot.mouseWheel(4); //scroll down
         robot.delay(1000); //wait for 1 second
 
+
         if(determineIfValidZip(robot, zip)) {
-            
-        } //determine if zip code is valid
+            robot.mouseMove(179, 275);
+            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+            robot.delay(1000);
+        } //execute if zip code is valid
     }
 
-    public static int returnKeycode(char character) {
-        int keyCode = 1;
-        switch (character) {
-            case '0':
-                keyCode = KeyEvent.VK_0;
-                break;
-            case '1':
-                keyCode = KeyEvent.VK_1;
-                break;
-            case '2':
-                keyCode = KeyEvent.VK_2;
-                break;
-            case '3':
-                keyCode = KeyEvent.VK_3;
-                break;
-            case '4':
-                keyCode = KeyEvent.VK_4;
-                break;
-            case '5':
-                keyCode = KeyEvent.VK_5;
-                break;
-            case '6':
-                keyCode = KeyEvent.VK_6;
-                break;
-            case '7':
-                keyCode = KeyEvent.VK_7;
-                break;
-            case '8':
-                keyCode = KeyEvent.VK_8;
-                break;
-            case '9':
-                keyCode = KeyEvent.VK_9;
-                break;
-            default:
-                keyCode = 0;
-        }
-        return keyCode;
+    public static void handleUtilityPage(Robot robot, int zip) throws AWTException, UnsupportedFlavorException, IOException {
+        robot.mouseMove(79, 692);
+        tripleClick(robot); //triple click to highlight # of contaminants
+        copyText(robot); //copy # of contaminants
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard(); //get clipboard
+        String clipboardContents = (String) clipboard.getData(DataFlavor.stringFlavor); //get clipboard contents
+        System.out.println(clipboardContents); //print clipboard contents
+        FileWriter filePusher = new FileWriter("results.txt", true); //create file writer object
+        filePusher.write("Zip: " + zip + " Contaminants: " + clipboardContents + "\n"); //write zip and contaminants to file
+        robot.delay(500);
+        filePusher.close(); //close file writer
+
     }
 
     public static boolean determineIfValidZip(Robot robot, int zip) throws AWTException, UnsupportedFlavorException, IOException {
         robot.mouseMove(179, 226);
-        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-        robot.delay(80);
-        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-        robot.delay(80);
-        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
-        robot.delay(80); //triple click to highlight zip code
+        tripleClick(robot); //triple click to highlight zip code
         copyText(robot); //copy zip code
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         String clipboardContents = (String) clipboard.getData(DataFlavor.stringFlavor);
@@ -141,6 +121,36 @@ public class Main {
             return false;
         }
 
+    }
+
+    public static int returnKeycode(char character) {
+        int keyCode;
+        keyCode = switch (character) {
+            case '0' -> KeyEvent.VK_0;
+            case '1' -> KeyEvent.VK_1;
+            case '2' -> KeyEvent.VK_2;
+            case '3' -> KeyEvent.VK_3;
+            case '4' -> KeyEvent.VK_4;
+            case '5' -> KeyEvent.VK_5;
+            case '6' -> KeyEvent.VK_6;
+            case '7' -> KeyEvent.VK_7;
+            case '8' -> KeyEvent.VK_8;
+            case '9' -> KeyEvent.VK_9;
+            default -> 0;
+        };
+        return keyCode;
+    }
+
+    public static void tripleClick(Robot robot) {
+        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+        robot.delay(80);
+        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+        robot.delay(80);
+        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+        robot.delay(80);
     }
 
     public static void copyText(Robot robot) {
