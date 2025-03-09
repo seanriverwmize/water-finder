@@ -27,6 +27,7 @@ public class Main {
 
 
         inputController.mouseMove(1253, 10); //move mouse to minimize code editor
+        inputController.delay(1000); //wait for 1 second
         inputController.mousePress(InputEvent.BUTTON1_DOWN_MASK); //press left mouse button
         inputController.mouseRelease(InputEvent.BUTTON1_DOWN_MASK); //release left mouse button
 
