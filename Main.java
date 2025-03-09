@@ -63,6 +63,12 @@ public class Main {
             robot.keyRelease(keyToPress); //release key
 
         }
+        robot.delay(1000); //wait for 1 second
+        robot.keyPress(KeyEvent.VK_ENTER); //press enter key
+        robot.delay(1000); //wait for 1 second
+
+        robot.mouseWheel(4); //scroll down
+        robot.delay(1000); //wait for 1 second
     }
 
     public static int returnKeycode(char character) {
