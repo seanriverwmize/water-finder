@@ -1,9 +1,11 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.datatransfer.*;
+import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args) throws AWTException{
-
+    public static void main(String[] args) throws AWTException, UnsupportedFlavorException, IOException {
+        boolean isValidZip;
         Robot inputController = new Robot(); //create robot object
 
         String zipCodesString = """
@@ -49,7 +51,7 @@ public class Main {
         
     }
 
-    public static void enterZip(Robot robot, int zip) {
+    public static void enterZip(Robot robot, int zip) throws AWTException, UnsupportedFlavorException, IOException {
         System.out.println("Beginning data collection for Zip " + zip); //print first zip code
         robot.mouseMove(520, 645); //move mouse to zipcode search box
         robot.delay(1000); //wait for 1 second
@@ -69,6 +71,10 @@ public class Main {
 
         robot.mouseWheel(4); //scroll down
         robot.delay(1000); //wait for 1 second
+
+        if(determineIfValidZip(robot, zip)) {
+            
+        } //determine if zip code is valid
     }
 
     public static int returnKeycode(char character) {
@@ -108,6 +114,39 @@ public class Main {
                 keyCode = 0;
         }
         return keyCode;
+    }
+
+    public static boolean determineIfValidZip(Robot robot, int zip) throws AWTException, UnsupportedFlavorException, IOException {
+        robot.mouseMove(179, 226);
+        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+        robot.delay(80);
+        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+        robot.delay(80);
+        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+        robot.delay(80); //triple click to highlight zip code
+        copyText(robot); //copy zip code
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        String clipboardContents = (String) clipboard.getData(DataFlavor.stringFlavor);
+        System.out.println(clipboardContents);
+        if (clipboardContents.contains("Utility")) {
+            System.out.println("Zip " + zip + " is valid");
+            return true;
+        } else {
+            System.out.println("Zip " + zip + " is invalid");
+            return false;
+        }
+
+    }
+
+    public static void copyText(Robot robot) {
+        robot.keyPress(KeyEvent.VK_CONTROL);
+        robot.keyPress(KeyEvent.VK_C);
+        robot.keyRelease(KeyEvent.VK_C);
+        robot.keyRelease(KeyEvent.VK_CONTROL);
+        robot.delay(80);
     }
 
 }
