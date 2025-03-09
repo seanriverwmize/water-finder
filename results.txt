@@ -1,1 +1,7 @@
-
+	
+Zip: 10001 Contaminants: 8
+Zip: 10002 Contaminants: 8
+Zip: 10003 Contaminants: 8
+Zip: 10004 Contaminants: 8
+Zip 80488 is invalid
+Zip 10001 is invalid

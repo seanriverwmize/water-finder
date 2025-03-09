@@ -1,6 +1,11 @@
-import java.awt.*;
-import java.awt.datatransfer.*;
-import java.awt.event.*;
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -9,8 +14,9 @@ public class Main {
         Robot inputController = new Robot(); //create robot object
         
 
+
         String zipCodesString = """
-        10001-14999, 15001-19699, 19700-19999, 19815, 19853, 19925, 20001-20599, 20101-20199,  
+        80488, 10001-14999, 15001-19699, 19700-19999, 19815, 19853, 19925, 20001-20599, 20101-20199,  
         20331, 20588, 20601-21999, 22001-24699, 24701-26899, 27001-28999, 29001-29999, 
         30001-31999, 31788, 31905, 32001-34999, 32350, 35001-36999, 37001-38599, 38601-39799, 
         38769, 38852, 39801-39899, 39901, 40001-42799, 43001-45999, 46001-47999, 48001-49999, 
@@ -41,30 +47,45 @@ public class Main {
                 int endZip = Integer.parseInt(zipCodeRange[1]);
                 for (int currentZip = startZip; currentZip <= endZip; currentZip++) {
                     enterZip(inputController, currentZip);
-                    handleUtilitySelectionPage(inputController, currentZip);
-                    handleUtilityPage(inputController, currentZip);
+                    if(handleUtilitySelectionPage(inputController, currentZip)){
+                        handleUtilityPage(inputController, currentZip);
+                        backPage(inputController);
+                        backPage(inputController);
+                    }
+                    else {
+                        FileWriter filePusher = new FileWriter("results.txt", true); //create file writer object
+                        filePusher.write("Zip " + currentZip + " is invalid\n");
+                        filePusher.flush(); //flush file writer
+                        filePusher.close(); //close file writer 
+                        backPage(inputController);
+                    }
                 }
             } else {
                 int currentZip = Integer.parseInt(zipCodeString);
                 enterZip(inputController, currentZip);
-                handleUtilitySelectionPage(inputController, currentZip);
-                handleUtilityPage(inputController, currentZip);
+                if(handleUtilitySelectionPage(inputController, currentZip)){
+                    handleUtilityPage(inputController, currentZip);
+                    backPage(inputController);
+                    backPage(inputController);
+                }
+                else {
+                    FileWriter filePusher = new FileWriter("results.txt", true); //create file writer object
+                    filePusher.write("Zip " + currentZip + " is invalid\n");
+                    filePusher.flush(); //flush file writer
+                    filePusher.close(); //close file writer 
+                    backPage(inputController);
+                }
+                
             }
         }
-
-        
-
-        
     }
 
     public static void enterZip(Robot robot, int zip) throws AWTException, UnsupportedFlavorException, IOException {
         System.out.println("Beginning data collection for Zip " + zip); //print first zip code
         robot.mouseMove(520, 645); //move mouse to zipcode search box
         robot.delay(1000); //wait for 1 second
-        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK); //press left mouse button
-        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK); //release left mouse button
+        tripleClick(robot); //triple click to highlight contents of search box
         for (int i = 0; i < 5; ++i) {
-            System.out.println(Integer.toString(zip).charAt(i)); //print current digit
             int keyToPress = returnKeycode(Integer.toString(zip).charAt(i)); //get keycode for current digit
             robot.keyPress(keyToPress); //press key)
             robot.delay(200); //wait for 200 milliseconds
@@ -79,31 +100,35 @@ public class Main {
         
     }
 
-    public static void handleUtilitySelectionPage(Robot robot, int zip) throws AWTException, UnsupportedFlavorException, IOException {
+    public static boolean handleUtilitySelectionPage(Robot robot, int zip) throws AWTException, UnsupportedFlavorException, IOException {
         robot.mouseWheel(4); //scroll down
         robot.delay(1000); //wait for 1 second
+        boolean isValidZip = determineIfValidZip(robot, zip); //determine if zip code is valid
 
-
-        if(determineIfValidZip(robot, zip)) {
+        if(isValidZip) {
             robot.mouseMove(179, 275);
             robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
             robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
             robot.delay(1000);
-        } //execute if zip code is valid
+            return true;
+        } //click on first utility if zip code is valid and has only one utility
+        else {
+            return false;
+        }
     }
 
     public static void handleUtilityPage(Robot robot, int zip) throws AWTException, UnsupportedFlavorException, IOException {
+        FileWriter filePusher = new FileWriter("results.txt", true); //create file writer object
         robot.mouseMove(79, 692);
         tripleClick(robot); //triple click to highlight # of contaminants
         copyText(robot); //copy # of contaminants
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard(); //get clipboard
         String clipboardContents = (String) clipboard.getData(DataFlavor.stringFlavor); //get clipboard contents
         System.out.println(clipboardContents); //print clipboard contents
-        FileWriter filePusher = new FileWriter("results.txt", true); //create file writer object
-        filePusher.write("Zip: " + zip + " Contaminants: " + clipboardContents + "\n"); //write zip and contaminants to file
+        filePusher.write("Zip: " + zip + " || Contaminants: " + clipboardContents); //write zip and contaminants to file
         robot.delay(500);
-        filePusher.close(); //close file writer
-
+        filePusher.flush(); //flush file writer
+        filePusher.close(); //close file writer 
     }
 
     public static boolean determineIfValidZip(Robot robot, int zip) throws AWTException, UnsupportedFlavorException, IOException {
@@ -159,6 +184,15 @@ public class Main {
         robot.keyRelease(KeyEvent.VK_C);
         robot.keyRelease(KeyEvent.VK_CONTROL);
         robot.delay(80);
+    }
+
+    public static void backPage(Robot robot) {
+        robot.mouseMove(26, 66);
+        robot.delay(200);
+        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
+        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+        robot.delay(1000);
+
     }
 
 }
