@@ -1,7 +1,15 @@
 	
-Zip: 10001 Contaminants: 8
-Zip: 10002 Contaminants: 8
-Zip: 10003 Contaminants: 8
-Zip: 10004 Contaminants: 8
 Zip 80488 is invalid
-Zip 10001 is invalid
+Zip: 10001 || Contaminants:         tripleClick(robot); //triple click to Utility Keyword or other content
+Zip 80488 is invalid
+Zip: 10001 || Contaminants:         inputController.mouseMove(1804, 14); //move mouse to minimize code editor
+Zip 80488 is invalid
+Zip: 10001 || Contaminants: 8
+Zip: 10002 || Contaminants: 8
+Zip: 10003 || Contaminants: 8
+Zip: 10004 || Contaminants: 8
+Zip: 10005 || Contaminants: 8
+Zip: 10006 || Contaminants: 8
+Zip: 10007 || Contaminants: 8
+Zip 10008 is invalid
+Zip: 10009 || Contaminants: 8

@@ -35,7 +35,7 @@ public class Main {
         String[] zipCodesArray = zipCodesString.split(", "); //split zip codes into array
 
 
-        inputController.mouseMove(1253, 10); //move mouse to minimize code editor
+        inputController.mouseMove(1804, 14); //move mouse to minimize code editor
         inputController.delay(1000); //wait for 1 second
         inputController.mousePress(InputEvent.BUTTON1_DOWN_MASK); //press left mouse button
         inputController.mouseRelease(InputEvent.BUTTON1_DOWN_MASK); //release left mouse button
@@ -82,7 +82,7 @@ public class Main {
 
     public static void enterZip(Robot robot, int zip) throws AWTException, UnsupportedFlavorException, IOException {
         System.out.println("Beginning data collection for Zip " + zip); //print first zip code
-        robot.mouseMove(520, 645); //move mouse to zipcode search box
+        robot.mouseMove(756, 777); //move mouse to zipcode search box
         robot.delay(1000); //wait for 1 second
         tripleClick(robot); //triple click to highlight contents of search box
         for (int i = 0; i < 5; ++i) {
@@ -106,7 +106,7 @@ public class Main {
         boolean isValidZip = determineIfValidZip(robot, zip); //determine if zip code is valid
 
         if(isValidZip) {
-            robot.mouseMove(179, 275);
+            robot.mouseMove(367, 413);
             robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
             robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
             robot.delay(1000);
@@ -119,7 +119,7 @@ public class Main {
 
     public static void handleUtilityPage(Robot robot, int zip) throws AWTException, UnsupportedFlavorException, IOException {
         FileWriter filePusher = new FileWriter("results.txt", true); //create file writer object
-        robot.mouseMove(79, 692);
+        robot.mouseMove(326, 834);
         tripleClick(robot); //triple click to highlight # of contaminants
         copyText(robot); //copy # of contaminants
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard(); //get clipboard
@@ -132,9 +132,9 @@ public class Main {
     }
 
     public static boolean determineIfValidZip(Robot robot, int zip) throws AWTException, UnsupportedFlavorException, IOException {
-        robot.mouseMove(179, 226);
-        tripleClick(robot); //triple click to highlight zip code
-        copyText(robot); //copy zip code
+        robot.mouseMove(339, 352);
+        tripleClick(robot); //triple click to Utility Keyword or other content
+        copyText(robot); //copy "Utility" or other content
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         String clipboardContents = (String) clipboard.getData(DataFlavor.stringFlavor);
         System.out.println(clipboardContents);
@@ -146,6 +146,10 @@ public class Main {
             return false;
         }
 
+    }
+
+    public static void detectPopup(Robot robot) {
+        robot.mouseMove(1083, 716);
     }
 
     public static int returnKeycode(char character) {
